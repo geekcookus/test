@@ -41,56 +41,33 @@ router.post('/api/collaboration', function (req, res, next) {
 
   if (req.body.title == "new document") {//для прохождения теста
     res.json({ message: 'Hello Boosters.pro' });
-  } else if(req.body.from_post && req.body.to_post && req.body.date_post ) {//или передаеться параметры о рейсе
+  } else if (req.body.trainNumber) {//или передаеться параметры о рейсе
 
-    var from_post = req.body.from_post;
-    var to_post = req.body.to_post;
-    var date_post = req.body.date_post;
-    var trainNumber = req.body.trainNumber;
+
     const request_kudago = async (datefrom, dateto, location) => {
       const response = await fetch("https://kudago.com/public-api/v1.4/events/?lang=&fields=id,dates,short_title,images,site_url&expand=&order_by=&text_format=&ids=&location" + location + "=&actual_since=" + datefrom + "&actual_until=" + dateto + "&is_free=&categories=&lon=&lat=&radius=&is_free=0");
       const kudago = await response.json();
       return kudago.results;
-    }
-    const request_onetwotrip = async (from_post, to_post, date_post, trainNumber) => {
-      const response = await fetch('https://www.onetwotrip.com/_api/rzd/metaTimetable/?from=' + from_post + '&to=' + to_post + '&date=' + date_post + '&source=web');
-      const onetwotrip = await response.json();
-      return onetwotrip.result;
     }
 
     MongoClient.connect(url, options, (err, database) => {
       if (err) {
         console.log(`FATAL MONGODB CONNECTION ERROR: ${err}:${err.stack}`)
       }
-      request_onetwotrip(from_post, to_post, date_post, trainNumber).then(onetwotrip => {
-        element = onetwotrip[0];//первый рейс из выдачи
-        for (var key in onetwotrip) {//если есть номер рейса выбираем
-          if (trainNumber && trainNumber == onetwotrip[key].trainNumber) {
-            element = onetwotrip[key];
-          }
-        }
-        var datefrom = (new Date(element.departure.localTime) / 1000).toFixed(0);
-        var dateto = (new Date(element.departure.localTime) / 1000 + 259200).toFixed(0);
-        var loc = cityobj[to_post];
-        request_kudago(datefrom, dateto, loc).then(event => {
-          element['events'] = event;
-          res.json(element);
-          var db = database.db('api')//запись в базу поиск по номеру рейса и датам не дал результатов
-          db.collection("tickets").findOne({ "trainNumber": element.trainNumber, "from": element.from, "to": element.to }, function (err, resbd) {
-            if (err) {
-              res.json({ "error": err });
-            };
-            if (!resbd) {
-              db.collection("tickets").insert(element, function (err, resbd) {
-                if (err) {
-                  res.json({ "error": err });
-                };
-
-              });
-            }
-          });
+      element = req.body;
+      var datefrom = (new Date(element.departure.localTime) / 1000).toFixed(0);
+      var dateto = (new Date(element.departure.localTime) / 1000 + 259200).toFixed(0);
+      var loc = cityobj[element.to.metaId];
+      request_kudago(datefrom, dateto, loc).then(event => {
+        element['events'] = event;
+        res.json(element);
+        var db = database.db('api')//запись в базу поиск по номеру рейса и датам не дал результатов
+        db.collection("tickets").insert(element, function (err, resbd) {
+          if (err) {
+            res.json({ "error": err });
+          };
         });
-      })
+      });
     })
   }
 })
