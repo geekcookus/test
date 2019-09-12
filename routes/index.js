@@ -11,7 +11,8 @@ const options = {
 }
 
 const cityobj = {
-  22823: 'msc',
+  22871: 'spb',
+  22823: 'msk',
   23868: 'ekb',
   22852: 'krasnoyarsk',
   22852: 'krd',
@@ -44,8 +45,8 @@ router.post('/api/collaboration', function (req, res, next) {
   } else if (req.body.ticket) {//или передаеться параметры о рейсе
 
 
-    const request_kudago = async (datefrom, dateto, location) => {
-      const response = await fetch("https://kudago.com/public-api/v1.4/events/?lang=&fields=id,dates,short_title,images,site_url&expand=&order_by=&text_format=&ids=&location" + location + "=&actual_since=" + datefrom + "&actual_until=" + dateto + "&is_free=&categories=&lon=&lat=&radius=&is_free=0&page_size=3");
+    const request_kudago = async (datefrom, dateto, loc) => {
+      const response = await fetch("https://kudago.com/public-api/v1.4/events/?lang=&fields=id,dates,short_title,images,site_url&expand=&order_by-rank=&text_format=&ids=&location=" + loc + "&actual_since=" + datefrom + "&actual_until=" + dateto + "&is_free=&categories=&lon=&lat=&radius=&is_free=0&page_size=3");
       const kudago = await response.json();
       return kudago.results;
     }
