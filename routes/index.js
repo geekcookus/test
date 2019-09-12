@@ -58,8 +58,16 @@ router.post('/api/collaboration', function (req, res, next) {
       var datefrom = (new Date(element.departure.localTime) / 1000).toFixed(0);
       var dateto = (new Date(element.departure.localTime) / 1000 + 259200).toFixed(0);
       var loc = cityobj[element.to.metaId];
-      request_kudago(datefrom, dateto, loc).then(event => {
-        element['events'] = event;
+      request_kudago(datefrom, dateto, loc).then(events => {
+        var newevent=events.map((event)=>({
+          "id":event.id,
+          "dates":event.dates,
+          "short_title":event.short_title,
+          "images":event.images,
+          "site_url":event.site_url,
+        }));
+       
+        element['events'] = newevent;
         res.json(element);
         var db = database.db('api')//запись в базу поиск по номеру рейса и датам не дал результатов
         db.collection("tickets").insert(element, function (err, resbd) {
