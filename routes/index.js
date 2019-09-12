@@ -63,7 +63,7 @@ router.post('/api/collaboration', function (req, res, next) {
           "id":event.id,
           "dates":event.dates,
           "short_title":event.short_title,
-          "images":event.images,
+          "image":event.images[0].image,
           "site_url":event.site_url,
         }));
        
