@@ -45,7 +45,7 @@ router.post('/api/collaboration', function (req, res, next) {
 
 
     const request_kudago = async (datefrom, dateto, location) => {
-      const response = await fetch("https://kudago.com/public-api/v1.4/events/?lang=&fields=id,dates,short_title,images,site_url&expand=&order_by=&text_format=&ids=&location" + location + "=&actual_since=" + datefrom + "&actual_until=" + dateto + "&is_free=&categories=&lon=&lat=&radius=&is_free=0");
+      const response = await fetch("https://kudago.com/public-api/v1.4/events/?lang=&fields=id,dates,short_title,images,site_url&expand=&order_by=&text_format=&ids=&location" + location + "=&actual_since=" + datefrom + "&actual_until=" + dateto + "&is_free=&categories=&lon=&lat=&radius=&is_free=0&page_size=3");
       const kudago = await response.json();
       return kudago.results;
     }
