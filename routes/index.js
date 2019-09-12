@@ -45,29 +45,40 @@ router.post('/api/collaboration', function (req, res, next) {
   } else if (req.body.ticket) {//или передаеться параметры о рейсе
 
 
-    const request_kudago = async (datefrom, dateto, loc) => {
-      const response = await fetch("https://kudago.com/public-api/v1.4/events/?lang=&fields=id,dates,short_title,images,site_url&expand=&order_by-rank=&text_format=&ids=&location=" + loc + "&actual_since=" + datefrom + "&actual_until=" + dateto + "&is_free=&categories=&lon=&lat=&radius=&is_free=0&page_size=3");
-      const kudago = await response.json();
-      return kudago.results;
+    const request_kudago = async (date, loc) => {
+      var datefrom = (new Date(date) / 1000).toFixed(0);
+      var dateto = (new Date(date) / 1000 + 86400).toFixed(0);
+      const response1 = await fetch("https://kudago.com/public-api/v1.4/events/?lang=&fields=id,dates,short_title,images,site_url&expand=&order_by=-rank&text_format=&ids=&location=" + loc + "&actual_since=" + datefrom + "&actual_until=" + dateto + "&is_free=&categories=&lon=&lat=&radius=&is_free=0&page_size=1");
+      const kudago1 = await response1.json();
+      var resul_kudago=[];
+      resul_kudago[0]=kudago1.results[0];
+      var datefrom = (new Date(date) / 1000 + 86400).toFixed(0);
+      var dateto = (new Date(date) / 1000 + 86400*2).toFixed(0);
+      const response2 = await fetch("https://kudago.com/public-api/v1.4/events/?lang=&fields=id,dates,short_title,images,site_url&expand=&order_by=-rank&text_format=&ids=&location=" + loc + "&actual_since=" + datefrom + "&actual_until=" + dateto + "&is_free=&categories=&lon=&lat=&radius=&is_free=0&page_size=1");
+      const kudago2 = await response2.json();      
+      resul_kudago[1]=kudago2.results[0];
+      var datefrom = (new Date(date) / 1000 + 86400*2).toFixed(0);
+      var dateto = (new Date(date) / 1000 + 86400*3).toFixed(0);
+      const response3 = await fetch("https://kudago.com/public-api/v1.4/events/?lang=&fields=id,dates,short_title,images,site_url&expand=&order_by=-rank&text_format=&ids=&location=" + loc + "&actual_since=" + datefrom + "&actual_until=" + dateto + "&is_free=&categories=&lon=&lat=&radius=&is_free=0&page_size=1");
+      const kudago3 = await response3.json();      
+      resul_kudago[2]=kudago3.results[0];
+      return resul_kudago;
     }
 
     MongoClient.connect(url, options, (err, database) => {
       if (err) {
         console.log(`FATAL MONGODB CONNECTION ERROR: ${err}:${err.stack}`)
       }
-      element = req.body.ticket;
-      var datefrom = (new Date(element.departure.localTime) / 1000).toFixed(0);
-      var dateto = (new Date(element.departure.localTime) / 1000 + 259200).toFixed(0);
+      element = req.body.ticket;      
       var loc = cityobj[element.to.metaId];
-      request_kudago(datefrom, dateto, loc).then(events => {
+      request_kudago(element.departure.localTime, loc).then(events => {
         var newevent=events.map((event)=>({
           "id":event.id,
           "dates":event.dates,
           "short_title":event.short_title,
           "image":event.images[0].image,
           "site_url":event.site_url,
-        }));
-       
+        }));       
         element['events'] = newevent;
         res.json(element);
         var db = database.db('api')//запись в базу поиск по номеру рейса и датам не дал результатов
