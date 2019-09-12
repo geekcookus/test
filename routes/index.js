@@ -41,7 +41,7 @@ router.post('/api/collaboration', function (req, res, next) {
 
   if (req.body.title == "new document") {//для прохождения теста
     res.json({ message: 'Hello Boosters.pro' });
-  } else if (req.body.trainNumber) {//или передаеться параметры о рейсе
+  } else if (req.body.ticket) {//или передаеться параметры о рейсе
 
 
     const request_kudago = async (datefrom, dateto, location) => {
@@ -54,7 +54,7 @@ router.post('/api/collaboration', function (req, res, next) {
       if (err) {
         console.log(`FATAL MONGODB CONNECTION ERROR: ${err}:${err.stack}`)
       }
-      element = req.body;
+      element = req.body.ticket;
       var datefrom = (new Date(element.departure.localTime) / 1000).toFixed(0);
       var dateto = (new Date(element.departure.localTime) / 1000 + 259200).toFixed(0);
       var loc = cityobj[element.to.metaId];
