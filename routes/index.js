@@ -56,15 +56,20 @@ router.post('/api/collaboration', function (req, res, next) {
       }
       element = req.body.ticket;
       var datefrom = (new Date(element.departure.localTime) / 1000).toFixed(0);
+      var datefrom2 = (new Date(element.departure.localTime) / 1000 + 86400).toFixed(0);
       var dateto = (new Date(element.departure.localTime) / 1000 + 259200).toFixed(0);
       var loc = cityobj[element.to.metaId];
       request_kudago(datefrom, dateto, loc).then(events => {
+        var dates={
+          "start": datefrom,
+          "end": datefrom2
+      };
         var newevent=events.map((event)=>({
-          "id":event.id,
-          "dates":event.dates,
-          "short_title":event.short_title,
-          "image":event.images[0].image,
-          "site_url":event.site_url,
+          "id" : event.id,
+          "dates" : dates,
+          "short_title" : event.short_title,
+          "image" : event.images[0].image,
+          "site_url" : event.site_url,
         }));
        
         element['events'] = newevent;
