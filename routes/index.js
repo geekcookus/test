@@ -74,7 +74,20 @@ router.post('/api/collaboration', function (req, res, next) {
       request_kudago(element.departure.localTime, loc).then(events => {
         var newevent=events.map((event)=>({
           "id":event.id,
-          "dates":event.dates,
+          "dates":event.dates.reduce(function(obj, currentValue, index) {
+            console.log(currentValue);
+            if(index == 0){
+              obj.start=currentValue.start;
+              obj.end=currentValue.end;   
+            }
+            if (obj.start > currentValue.start){
+              obj.start=currentValue.start              
+            }
+            if (obj.end < currentValue.end){
+              obj.end=currentValue.end              
+            }
+            return obj;
+          }),
           "short_title":event.short_title,
           "image":event.images[0].image,
           "site_url":event.site_url,
