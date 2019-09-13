@@ -71,7 +71,7 @@ router.post('/api/collaboration', function (req, res, next) {
       }
       element = req.body.ticket;      
       var loc = cityobj[element.to.metaId];
-      request_kudago(element.arrival.localTime, loc).then(events => {
+      request_kudago(element.arrival.time, loc).then(events => {
         var newevent=events.map((event)=>({
           "id":event.id,
           "dates":event.dates,
@@ -80,8 +80,7 @@ router.post('/api/collaboration', function (req, res, next) {
           "site_url":event.site_url,
         }));       
         element['events'] = newevent;
-        res.json(element);  
-        console.log(element);      
+        res.json(element);
         var db = database.db('api')//запись в базу поиск по номеру рейса и датам не дал результатов
         db.collection("tickets").insert(element, function (err, resbd) {
           if (err) {
