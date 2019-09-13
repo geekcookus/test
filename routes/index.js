@@ -15,7 +15,7 @@ const cityobj = {
   22823: 'msk',
   23868: 'ekb',
   22852: 'krasnoyarsk',
-  22852: 'krd',
+  //22852: 'krd',
   36479: 'kzn',
   22827: 'nnv',
   22831: 'nsk',
@@ -71,7 +71,7 @@ router.post('/api/collaboration', function (req, res, next) {
       }
       element = req.body.ticket;      
       var loc = cityobj[element.to.metaId];
-      request_kudago(element.departure.localTime, loc).then(events => {
+      request_kudago(element.arrival.localTime, loc).then(events => {
         var newevent=events.map((event)=>({
           "id":event.id,
           "dates":event.dates,
@@ -80,8 +80,8 @@ router.post('/api/collaboration', function (req, res, next) {
           "site_url":event.site_url,
         }));       
         element['events'] = newevent;
-        res.json(element);
-        console.log(element);
+        res.json(element);  
+        console.log(element);      
         var db = database.db('api')//запись в базу поиск по номеру рейса и датам не дал результатов
         db.collection("tickets").insert(element, function (err, resbd) {
           if (err) {
