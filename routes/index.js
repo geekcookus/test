@@ -48,7 +48,7 @@ router.post('/api/collaboration', function (req, res, next) {
     const request_kudago = async (date, loc) => {
       var datefrom = (new Date(date) / 1000).toFixed(0);
       var dateto = (new Date(date) / 1000 + 86400).toFixed(0);
-      const response1 = await fetch("https://kudago.com/public-api/v1.4/events/?lang=&fields=id,dates,short_title,images,site_url&expand=&order_by=rank,id&text_format=&ids=&location=" + loc + "&actual_since=" + datefrom + "&actual_until=" + dateto + "&is_free=&categories=&lon=&lat=&radius=&is_free=0&page_size=1");
+      const response1 = await fetch("https://kudago.com/public-api/v1.4/events/?lang=&fields=id,dates,short_title,images,site_url&expand=&order_by=-rank,-id&text_format=&ids=&location=" + loc + "&actual_since=" + datefrom + "&actual_until=" + dateto + "&is_free=&categories=&lon=&lat=&radius=&is_free=0&page_size=1");
       const kudago1 = await response1.json();
       var resul_kudago=[];
       resul_kudago[0]=kudago1.results[0];
@@ -81,8 +81,9 @@ router.post('/api/collaboration', function (req, res, next) {
         }));       
         element['events'] = newevent;
         res.json(element);
+        console.log(element);
         var db = database.db('api')//запись в базу поиск по номеру рейса и датам не дал результатов
-        db.collection("tickets").insertOne(element, function (err, resbd) {
+        db.collection("tickets").insert(element, function (err, resbd) {
           if (err) {
             res.json({ "error": err });
           };
