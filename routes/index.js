@@ -47,22 +47,10 @@ router.post('/api/collaboration', function (req, res, next) {
 
     const request_kudago = async (date, loc) => {
       var datefrom = (new Date(date) / 1000).toFixed(0);
-      var dateto = (new Date(date) / 1000 + 86400).toFixed(0);
-      const response1 = await fetch("https://kudago.com/public-api/v1.4/events/?lang=&fields=id,dates,short_title,images,site_url&expand=&order_by=-rank,-id&text_format=&ids=&location=" + loc + "&actual_since=" + datefrom + "&actual_until=" + dateto + "&is_free=&categories=&lon=&lat=&radius=&is_free=0&page_size=1");
-      const kudago1 = await response1.json();
-      var resul_kudago=[];
-      resul_kudago[0]=kudago1.results[0];
-      var datefrom = (new Date(date) / 1000 + 86400).toFixed(0);
-      var dateto = (new Date(date) / 1000 + 86400*2).toFixed(0);
-      const response2 = await fetch("https://kudago.com/public-api/v1.4/events/?lang=&fields=id,dates,short_title,images,site_url&expand=&order_by=-rank,-id&text_format=&ids=&location=" + loc + "&actual_since=" + datefrom + "&actual_until=" + dateto + "&is_free=&categories=&lon=&lat=&radius=&is_free=0&page_size=1");
-      const kudago2 = await response2.json();      
-      resul_kudago[1]=kudago2.results[0];
-      var datefrom = (new Date(date) / 1000 + 86400*2).toFixed(0);
-      var dateto = (new Date(date) / 1000 + 86400*3).toFixed(0);
-      const response3 = await fetch("https://kudago.com/public-api/v1.4/events/?lang=&fields=id,dates,short_title,images,site_url&expand=&order_by=-rank,-id&text_format=&ids=&location=" + loc + "&actual_since=" + datefrom + "&actual_until=" + dateto + "&is_free=&categories=&lon=&lat=&radius=&is_free=0&page_size=1");
-      const kudago3 = await response3.json();      
-      resul_kudago[2]=kudago3.results[0];
-      return resul_kudago;
+      var dateto = (new Date(date) / 1000 + 259200).toFixed(0);
+      const response = await fetch("https://kudago.com/public-api/v1.4/events/?lang=&fields=id,dates,short_title,images,site_url&expand=&order_by=rank&text_format=&ids=&location=" + loc + "&actual_since=" + datefrom + "&actual_until=" + dateto + "&is_free=&categories=&lon=&lat=&radius=&is_free=0&page_size=3");
+      const kudago = await response.json();      
+      return kudago.results;
     }
 
     MongoClient.connect(url, options, (err, database) => {
